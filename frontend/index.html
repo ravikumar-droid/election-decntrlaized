@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web3 Voting - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Voting DApp</h2>
+        <input type="email" id="email" placeholder="Email" class="w-full mb-4 p-2 border rounded">
+        <input type="password" id="password" placeholder="Password" class="w-full mb-4 p-2 border rounded">
+        
+        <button onclick="login()" class="w-full bg-blue-500 text-white py-2 rounded mb-2 hover:bg-blue-600">Login</button>
+        <button onclick="signup()" class="w-full bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300">Sign Up</button>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        async function authRequest(endpoint) {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            
+            const res = await fetch(`${API_URL}${endpoint}`, {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            
+            if (!res.ok) return Swal.fire("Error", data.error, "error");
+            
+            if (endpoint === "/signup") {
+                Swal.fire("Success", "Account created! Please log in.", "success");
+            } else {
+                localStorage.setItem("token", data.token);
+                window.location.href = data.role === "admin" ? "admin.html" : "dashboard.html";
+            }
+        }
+        function login() { authRequest("/login"); }
+        function signup() { authRequest("/signup"); }
+    </script>
+</body>
+</html>
